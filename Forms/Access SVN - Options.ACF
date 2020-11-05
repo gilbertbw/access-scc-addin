@@ -465,7 +465,7 @@ Begin Form
                             Width =2220
                             Height =240
                             Name ="Label26"
-                            Caption ="Commit to SVN after export?"
+                            Caption ="Commit to repo after export?"
                         End
                     End
                 End
@@ -516,7 +516,7 @@ Begin Form
                             Width =2385
                             Height =240
                             Name ="lblUpdate"
-                            Caption ="Update from SVN before import?"
+                            Caption ="Update from repo before import?"
                             LayoutCachedLeft =345
                             LayoutCachedTop =3572
                             LayoutCachedWidth =2730
@@ -1557,13 +1557,35 @@ Private Sub cboSCCSystem_AfterUpdate()
       chkCommit_AfterUpdate
       chkImport.Enabled = True
       chkImport_AfterUpdate
+      
+      Me.Label38.Visible = True
+      Me.Box37.Visible = True
+      Me.txtLastImported.Visible = True
+      Me.txtLastVersion.Visible = True
+      Me.txtFolderVersion.Visible = True
+      Me.txtLatestVersion.Visible = True
+      Me.chkRepository.Visible = True
+      
     Case sccSystemText
-      chkCommit = False
+      chkCommit = True
       chkCommit.Enabled = False
-      chkCommit_AfterUpdate
+      chkShowCommit = False
+      chkShowCommit.Enabled = False
+      chkNoImportExternalChanges = True
+      chkNoImportExternalChanges.Enabled = False
+      Application.RunCommand acCmdSaveRecord
+      
       chkImport = False
       chkImport.Enabled = False
       chkImport_AfterUpdate
+      
+      Me.Label38.Visible = False
+      Me.Box37.Visible = False
+      Me.txtLastImported.Visible = False
+      Me.txtLastVersion.Visible = False
+      Me.txtFolderVersion.Visible = False
+      Me.txtLatestVersion.Visible = False
+      Me.chkRepository.Visible = False
   End Select
   
   UpdateVersionDetails
@@ -1794,7 +1816,7 @@ Private Sub Form_Load()
 
   Call SCC_IsSupportedClient  ' Throw any warnings before doing anything
 
-  UpdateVersionDetails
+  cboSCCSystem_AfterUpdate
   If Me.chkRepository = True And Me.txtLastVersion.Value <> "" And Me.txtLastVersion.Value <> -1 Then
     ' This is not first use of this DB, and startup check is enabled
     pvt_CheckVersionWarnings
@@ -1804,7 +1826,6 @@ Private Sub Form_Load()
     Me.txtFolderVersion = ""
   End If
 
-  Me.chkNoImportExternalChanges.Value = False
   Me.txtDBFile = getCurrentDBSize()
   Forms![frmSplash].TimerInterval = 3000  ' This will close the splash screen in 3 seconds
 End Sub
